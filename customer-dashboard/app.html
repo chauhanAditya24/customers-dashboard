@@ -978,6 +978,52 @@
 ]
 
             
+            //Helper function
+
+            const uniqueCustomers = (customers) => {
+              const result = _.uniqBy(customers, 'Phone')
+              return result
+            }
+
+            const CustomersTable = (props) => {
+              const customers = props.customers
+              return (
+                  <table border="2px">
+                    <thead>
+                      <tr>
+                        <th>id</th>
+                        <th>username</th>
+                        <th>mobile</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        customers.map((ele,i) => {
+                          return (
+                            <tr key={ele.Phone}>
+                              <td>{i+1}</td>
+                              <td>{ele.Name}</td>
+                              <td>{ele.Phone}</td>
+                              <td>show</td>
+                            </tr>
+                          )
+                        })
+                      }
+                    </tbody>
+                  </table>
+              )
+            }
+
+            const CustomerContainer = (props) => {
+              const customers = props.customers
+              return(
+                <div>
+                  <h1>Listing Customers</h1>
+                  <CustomersTable customers={uniqueCustomers(customers)}/>
+                </div>
+              )
+            }
+
             const StatsItem = (props) => {
                 const {count, name} = props
                 return (
@@ -1001,27 +1047,26 @@
                     }
                     return sum
                 }
-                
-                const uniqueCustomers = () => {
-                    const result = _.uniqBy(customers, 'Phone')
-                    return result.length
-                }
 
                 return(
                     <div>
                         <StatsItem count={customers.length} name="Orders"/>
                         <StatsItem count={orderTotal()} name="Amount"/>
-                        <StatsItem count={uniqueCustomers()} name="Customers"/>
+                        <StatsItem count={uniqueCustomers(customers).length} name="Customers"/>
                     </div>
                 )
             }
 
+            
+
             const App = (props) => {
                 const [customers, setCustomers] = useState(customersData)
+
                 return (
                     <div>
                         <h1>Customers Dashboard</h1>
                         <StatsContainer customers={customers}/>
+                        <CustomerContainer customers={customers}/>
                     </div>
                 )
             }
