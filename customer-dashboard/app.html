@@ -978,6 +978,99 @@
 ]
 
             
+            //Helper function
+
+            const uniqueCustomers = (customers) => {
+              const result = _.uniqBy(customers, 'Phone')
+              return result
+            }
+
+            const orderTotal = (customers) => {
+                    let sum = 0
+
+                    for(const customer of customers) {
+                        sum+=customer.Amount
+                    }
+                    return sum
+                }    
+
+            const CustomersTable = (props) => {
+              const {customers, showDetails} = props
+              return (
+                  <table border="2px">
+                    <thead>
+                      <tr>
+                        <th>id</th>
+                        <th>username</th>
+                        <th>mobile</th>
+                        <th>details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        customers.map((customer,i) => {
+                          return (
+                            <tr key={customer.Phone}>
+                              <td>{i+1}</td>
+                              <td>{customer.Name}</td>
+                              <td>{customer.Phone}</td>
+                              <td> <button onClick={() => {
+                                showDetails(customer)
+                              }}> show </button></td>
+                            </tr>
+                          )
+                        })
+                      }
+                    </tbody>
+                  </table>
+              )
+            }
+
+            const Search = (props) => {
+              const {term , handleChange} = props
+
+              return (
+                <input type="text" value={term} onChange={handleChange} placeholder="enter name or phone number" />
+              )
+            }
+
+            const CustomerContainer = (props) => {
+              const customers = props.customers
+              const [term, setTerm] = useState('')
+              const onlyUniqueCustomer = uniqueCustomers(customers)
+
+              const showDetails = (customer) => {
+                const customerOrder = customers.filter( c => c.Phone === customer.Phone)
+                const customerTotalAmt = orderTotal(customerOrder)
+
+                alert( `
+                  Name : ${customer.Name},
+                  Order Count : ${customerOrder.length},
+                  Order Total : ${customerTotalAmt}
+                `)
+              }
+
+              const filterUniqueCustomers = () => {
+                const result = onlyUniqueCustomer.filter( (customer) => {
+                  return customer.Name.toLowerCase().includes(term) || customer.Phone.toString().includes(term)
+                })
+                return result
+              }
+
+              const handleChange = (e) => {
+                const value = e.target.value
+                setTerm(value)
+              }
+
+              return(
+                <div>
+                  <h1>Listing Customers</h1>
+                  <Search term={term} handleChange={handleChange}/>
+                  <CustomersTable customers={filterUniqueCustomers()} showDetails={showDetails}/>
+                </div>
+              )
+            }
+
             const StatsItem = (props) => {
                 const {count, name} = props
                 return (
@@ -993,35 +1086,23 @@
                 
                 const initialVal = 0
 
-                const orderTotal = () => {
-                    let sum = 0
-
-                    for(const customer of customers) {
-                        sum+=customer.Amount
-                    }
-                    return sum
-                }
-                
-                const uniqueCustomers = () => {
-                    const result = _.uniqBy(customers, 'Phone')
-                    return result.length
-                }
-
                 return(
                     <div>
                         <StatsItem count={customers.length} name="Orders"/>
-                        <StatsItem count={orderTotal()} name="Amount"/>
-                        <StatsItem count={uniqueCustomers()} name="Customers"/>
+                        <StatsItem count={orderTotal(customers)} name="Amount"/>
+                        <StatsItem count={uniqueCustomers(customers).length} name="Customers"/>
                     </div>
                 )
             }
-
+          
             const App = (props) => {
                 const [customers, setCustomers] = useState(customersData)
+
                 return (
                     <div>
                         <h1>Customers Dashboard</h1>
                         <StatsContainer customers={customers}/>
+                        <CustomerContainer customers={customers}/>
                     </div>
                 )
             }
